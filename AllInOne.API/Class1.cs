@@ -4,3 +4,4 @@ namespace AllInOne.API {
     public class Class1 {
     }
 }
+ 
