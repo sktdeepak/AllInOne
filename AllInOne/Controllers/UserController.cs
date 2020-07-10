@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AllInOne.API.Interface;
+using AllInOne.API.Model;
 using AllInOne.Data.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,12 @@ namespace AllInOne.Controllers {
         [Route("SubmitUser")]
         public async Task<int> SubmitUser([FromBody]UserInfo userInfo) {
             return await _userService.SaveUserDetails(userInfo);
+        }
+
+        [HttpGet]
+        [Route("GetUserList")]
+        public async Task<List<UserInfoModel>> GetUserList() {
+            return await _userService.UserList();
         }
     }
 }

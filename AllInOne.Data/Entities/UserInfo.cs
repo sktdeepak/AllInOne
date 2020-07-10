@@ -8,6 +8,7 @@ namespace AllInOne.Data.Entities
         public UserInfo()
         {
             UserPersonelInfo = new HashSet<UserPersonelInfo>();
+            WeightDetail = new HashSet<WeightDetail>();
         }
 
         public int Id { get; set; }
@@ -25,7 +26,7 @@ namespace AllInOne.Data.Entities
         public DateTime? ModifiedByTs { get; set; }
 
         public virtual Role Role { get; set; }
-        public virtual WeightDetail WeightDetail { get; set; }
         public virtual ICollection<UserPersonelInfo> UserPersonelInfo { get; set; }
+        public virtual ICollection<WeightDetail> WeightDetail { get; set; }
     }
 }

@@ -21,5 +21,9 @@ namespace AllInOne.Data.Implementation {
             await _allInOneContext.UserInfo.AddAsync(userInfo);
             return await _allInOneContext.SaveChangesAsync();
         }
+
+        public async Task<List<UserInfo>> UserList() {
+            return await _allInOneContext.UserInfo.ToListAsync();
+        }
     }
 }

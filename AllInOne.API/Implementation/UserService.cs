@@ -1,4 +1,5 @@
 ﻿using AllInOne.API.Interface;
+using AllInOne.API.Model;
 using AllInOne.Data.Entities;
 using AllInOne.Data.Interface;
 using System;
@@ -17,7 +18,29 @@ namespace AllInOne.API.Implementation {
         }
 
         public async Task<int> SaveUserDetails(UserInfo userInfo) {
+            userInfo.CreatedBy = 1;
+            userInfo.CreatedByTs = DateTime.Now;
             return await _userRepository.SaveUserDetails(userInfo);
         }
+
+        public async Task<List<UserInfoModel>> UserList() {
+          List<UserInfo> userInfo =  await _userRepository.UserList();
+            List<UserInfoModel> userInfoModelList = new List<UserInfoModel>();
+            foreach (var item in userInfo)
+            {
+                UserInfoModel userInfoModel = new UserInfoModel();
+                userInfoModel.Email = item.Email;
+                userInfoModel.Username = item.Username;
+                userInfoModel.Firstname = item.FirstName;
+                userInfoModel.LastName = item.LastName;
+                userInfoModel.Id = item.Id;
+                //userInfoModel.DateOfBirth = item.DateOfBirth;
+                //userInfoModel.
+                userInfoModelList.Add(userInfoModel);
+            }
+
+            return userInfoModelList;
+        }
+
     }
 }

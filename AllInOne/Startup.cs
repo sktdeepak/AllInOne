@@ -34,7 +34,9 @@ namespace AllInOne {
                 options.UseSqlServer("Server=.;Database=AllInOne;Trusted_Connection=Yes;"));
 
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IAgricultureService, AgricultureService>();
             services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IAgricultureRepository, AgricultureRepository>();
 
             services.AddSwaggerGen(c =>
             {

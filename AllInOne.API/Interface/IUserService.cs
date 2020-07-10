@@ -1,4 +1,5 @@
-﻿using AllInOne.Data.Entities;
+﻿using AllInOne.API.Model;
+using AllInOne.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,5 +9,6 @@ namespace AllInOne.API.Interface {
    public interface IUserService {
         Task<UserInfo> GetUserDetails(string username, string password);
         Task<int> SaveUserDetails(UserInfo userInfo);
+        Task<List<UserInfoModel>> UserList();
     }
 }

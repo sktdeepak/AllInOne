@@ -15,6 +15,7 @@ namespace AllInOne.Data.Entities
         {
         }
 
+        public virtual DbSet<Price> Price { get; set; }
         public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<UserInfo> UserInfo { get; set; }
         public virtual DbSet<UserPersonelInfo> UserPersonelInfo { get; set; }
@@ -31,6 +32,17 @@ namespace AllInOne.Data.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Price>(entity =>
+            {
+                entity.Property(e => e.CreatedByTs).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedByTs).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).IsRequired();
+
+                entity.Property(e => e.UnitPrice).HasColumnType("numeric(18, 2)");
+            });
+
             modelBuilder.Entity<Role>(entity =>
             {
                 entity.Property(e => e.CreatedByTs).HasColumnType("datetime");
@@ -100,19 +112,19 @@ namespace AllInOne.Data.Entities
 
             modelBuilder.Entity<WeightDetail>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-
                 entity.Property(e => e.CreatedByTs).HasColumnType("datetime");
+
+                entity.Property(e => e.Date).HasColumnType("date");
 
                 entity.Property(e => e.ModifiedByTs).HasColumnType("datetime");
 
-                entity.Property(e => e.UnitPrice).HasColumnType("numeric(18, 0)");
+                entity.Property(e => e.UnitPrice).HasColumnType("numeric(18, 2)");
 
-                entity.Property(e => e.Weight).HasColumnType("numeric(18, 0)");
+                entity.Property(e => e.Weight).HasColumnType("numeric(18, 2)");
 
-                entity.HasOne(d => d.IdNavigation)
-                    .WithOne(p => p.WeightDetail)
-                    .HasForeignKey<WeightDetail>(d => d.Id)
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.WeightDetail)
+                    .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_WeightDetail_UserInfo");
             });

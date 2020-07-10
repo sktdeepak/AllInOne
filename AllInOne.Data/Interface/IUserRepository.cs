@@ -8,5 +8,6 @@ namespace AllInOne.Data.Interface {
    public interface IUserRepository {
         Task<UserInfo> GetUserDetails(string username, string password);
         Task<int> SaveUserDetails(UserInfo userInfo);
+        Task<List<UserInfo>> UserList();
     }
 }
