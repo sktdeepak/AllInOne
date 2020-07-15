@@ -5,6 +5,7 @@ using AllInOne.Data.Implementation;
 using AllInOne.Data.Interface;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,14 +30,14 @@ namespace AllInOne.API.Implementation {
             weightDetail.Weight = fieldWorkModel.Weight;
             weightDetail.WeightType = 1;
             weightDetail.UserId = fieldWorkModel.UserId;
-            weightDetail.Date = fieldWorkModel.Date;
+            weightDetail.Date =  fieldWorkModel.Date;
             return fieldWorkModel;
         }
 
         public async Task<List<FieldWorkModel>> GetFieldWorkList() {
             List<FieldWorkModel> fieldWorkModels = new List<FieldWorkModel>();
             List<WeightDetail> weightDetail = await _agricultureRepository.GetFieldWorkList();
-            foreach (var item in weightDetail)
+            foreach (var item in weightDetail.OrderByDescending(i => i.Date))
             {
                 fieldWorkModels.Add(new FieldWorkModel()
                 {
@@ -60,7 +61,8 @@ namespace AllInOne.API.Implementation {
             weightDetail.Weight = fieldWorkModel.Weight;
             weightDetail.WeightType = 1;
             weightDetail.UserId = fieldWorkModel.UserId;
-            weightDetail.Date = fieldWorkModel.Date;
+            weightDetail.Date = TimeZone.CurrentTimeZone.ToLocalTime(fieldWorkModel.Date);
+            weightDetail.PriceId = fieldWorkModel.PriceId;
             return await _agricultureRepository.SaveFieldWork(weightDetail);
         }
 
@@ -72,8 +74,27 @@ namespace AllInOne.API.Implementation {
             weightDetail.Weight = fieldWorkModel.Weight;
             weightDetail.WeightType = 1;
             weightDetail.UserId = fieldWorkModel.UserId;
-            weightDetail.Date = fieldWorkModel.Date;
+            weightDetail.Date = TimeZone.CurrentTimeZone.ToLocalTime(fieldWorkModel.Date);
+            weightDetail.PriceId = fieldWorkModel.PriceId;
             return await _agricultureRepository.UpdateFieldWork(weightDetail);
+        }
+
+        public async Task<List<FieldWorkModel>> SearchFieldWorkByUserId(int id) {
+            List<FieldWorkModel> fieldWorkModels = new List<FieldWorkModel>();
+            List<WeightDetail> weightDetail = await _agricultureRepository.SearchFieldWorkByUserId(id);
+            foreach (var item in weightDetail.OrderByDescending(i => i.Date))
+            {
+                fieldWorkModels.Add(new FieldWorkModel()
+                {
+                    FullName = item.User.FullName,
+                    Weight = item.Weight,
+                    WeightType = item.WeightType,
+                    Date = item.Date,
+                    UserId = item.UserId,
+                    Id = item.Id
+                });
+            }
+            return fieldWorkModels;
         }
 
         public async Task<List<PriceModel>> DeletePrice(int id) {
@@ -127,5 +148,22 @@ namespace AllInOne.API.Implementation {
             price.UnitPrice = priceModel.UnitPrice;
             return await _agricultureRepository.UpdatePrice(price);
         }
+
+        public async Task<List<DashboardModel>> GetDashboardFieldWorkList() {
+            List<DashboardModel> dashboardModelList = new List<DashboardModel>();
+            List<WeightDetail> weightDetail = await _agricultureRepository.GetFieldWorkList();
+            var groupByList= weightDetail.OrderBy(p=>p.User.FirstName).GroupBy(g => g.UserId);
+            foreach (var item in groupByList)
+            {
+                dashboardModelList.Add(new DashboardModel()
+                {
+                    Name = item.FirstOrDefault().User.FirstName + " " + item.FirstOrDefault().User.LastName,
+                    Value = item.Sum(i => i.Weight)
+                }) ;
+            }
+            return dashboardModelList;
+        }
+
+        
     }
 }

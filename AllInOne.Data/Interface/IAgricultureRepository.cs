@@ -11,6 +11,8 @@ namespace AllInOne.Data.Interface {
         Task<WeightDetail> GetFieldWorkById(int id);
         Task<int> UpdateFieldWork(WeightDetail fieldWorkModel);
         Task<int> DeleteFieldWork(WeightDetail fieldWorkModel);
+        Task<List<WeightDetail>> SearchFieldWorkByUserId(int userId);
+
 
         //Price Master
         Task<List<Price>> GetPriceList();

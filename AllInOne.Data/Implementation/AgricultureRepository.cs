@@ -3,6 +3,7 @@ using AllInOne.Data.Interface;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -44,10 +45,16 @@ namespace AllInOne.Data.Implementation {
             return await _allInOneContext.SaveChangesAsync();
         }
 
+        public async Task<List<WeightDetail>> SearchFieldWorkByUserId(int userId) {
+            return await _allInOneContext.WeightDetail.Include(i => i.User).Where(w=>w.UserId == userId).ToListAsync();
+        }
+
         public async Task<int> SavePrice(Price price) {
             await _allInOneContext.Price.AddAsync(price);
             return await _allInOneContext.SaveChangesAsync();
         }
+
+       
 
         public async Task<int> UpdateFieldWork(WeightDetail fieldWorkModel) {
             _allInOneContext.WeightDetail.Update(fieldWorkModel);

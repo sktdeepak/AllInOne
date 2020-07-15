@@ -11,6 +11,11 @@ namespace AllInOne.API.Interface {
         Task<FieldWorkModel> GetFieldWorkById(int id);
         Task<int> UpdateFieldWork(FieldWorkModel fieldWorkModel);
         Task<List<FieldWorkModel>> DeleteFieldWork(int id);
+        Task<List<FieldWorkModel>> SearchFieldWorkByUserId(int id);
+
+        //Dashboard
+        Task<List<DashboardModel>> GetDashboardFieldWorkList();
+
 
         //Price Master
         Task<List<PriceModel>> GetPriceList();

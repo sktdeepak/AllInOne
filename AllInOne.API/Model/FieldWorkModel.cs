@@ -12,6 +12,7 @@ namespace AllInOne.API.Model {
         public int UserId { get; set; }
         public decimal Weight { get; set; }
         public DateTime Date { get; set; }
+        public int PriceId { get; set; }
 
     }
 }

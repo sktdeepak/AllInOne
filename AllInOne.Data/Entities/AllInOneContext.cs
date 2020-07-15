@@ -19,6 +19,7 @@ namespace AllInOne.Data.Entities
         public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<UserInfo> UserInfo { get; set; }
         public virtual DbSet<UserPersonelInfo> UserPersonelInfo { get; set; }
+        public virtual DbSet<UserPriceDetail> UserPriceDetail { get; set; }
         public virtual DbSet<WeightDetail> WeightDetail { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -108,6 +109,17 @@ namespace AllInOne.Data.Entities
                     .HasForeignKey(d => d.UserInfoId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_UserPersonelInfo_UserInfo");
+            });
+
+            modelBuilder.Entity<UserPriceDetail>(entity =>
+            {
+                entity.Property(e => e.CreatedByTs).HasColumnType("datetime");
+
+                entity.Property(e => e.CreditAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.DebitAmount).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.ModifiedByTs).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<WeightDetail>(entity =>

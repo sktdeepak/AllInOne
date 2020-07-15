@@ -4,6 +4,7 @@ using AllInOne.Data.Entities;
 using AllInOne.Data.Interface;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,7 +27,7 @@ namespace AllInOne.API.Implementation {
         public async Task<List<UserInfoModel>> UserList() {
           List<UserInfo> userInfo =  await _userRepository.UserList();
             List<UserInfoModel> userInfoModelList = new List<UserInfoModel>();
-            foreach (var item in userInfo)
+            foreach (var item in userInfo.OrderBy(k=>k.FirstName))
             {
                 UserInfoModel userInfoModel = new UserInfoModel();
                 userInfoModel.Email = item.Email;

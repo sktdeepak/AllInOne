@@ -38,6 +38,12 @@ namespace AllInOne.Controllers
             return await _agricultureService.UpdateFieldWork(fieldWorkModel);
         }
 
+        [HttpGet]
+        [Route("SearchFieldWorkListByUserId/{id}")]
+        public async Task<List<FieldWorkModel>> SearchFieldWorkListByUserId(int id) {
+            return await _agricultureService.SearchFieldWorkByUserId(id);
+        }
+
         [HttpDelete]
         [Route("DeleteFieldWork/{id}")]
         public async Task<List<FieldWorkModel>> Delete(int id) {
