@@ -14,8 +14,19 @@ namespace AllInOne.API.Implementation {
         public PriceService(IPriceRepository priceRepository) {
             _priceRepository = priceRepository;
         }
-        public async Task<int> DeleteUserPriceDetail(int id) {
-            return await _priceRepository.DeleteUserPriceDetail(id);
+        public async Task<List<UserPriceDetailModel>> DeleteUserPriceDetail(int id) {
+             await _priceRepository.DeleteUserPriceDetail(id);
+            return await GetUserPriceDetailList();
+        }
+
+        public async Task<UserPriceDetailModel> GetUserPriceDetail(int id) {
+            UserPriceDetailModel userPriceDetailModel = new UserPriceDetailModel();
+            UserPriceDetail userPriceDetail = await _priceRepository.GetUserPriceDetail(id);
+            userPriceDetailModel.CreditAmount = userPriceDetail.CreditAmount;
+            userPriceDetailModel.DebitAmount = userPriceDetail.DebitAmount;
+            userPriceDetailModel.Id = userPriceDetail.Id;
+            userPriceDetailModel.UserId = userPriceDetail.UserId;
+            return userPriceDetailModel;
         }
 
         public async Task<List<UserPriceDetailModel>> GetUserPriceDetailList() {
@@ -28,24 +39,26 @@ namespace AllInOne.API.Implementation {
             return userPriceDetailModelList;
         }
 
-        public async Task<int> SaveUserPriceDetail(UserPriceDetailModel userPriceDetailModel) {
+        public async Task<List<UserPriceDetailModel>> SaveUserPriceDetail(UserPriceDetailModel userPriceDetailModel) {
             UserPriceDetail userPriceDetail = new UserPriceDetail();
             userPriceDetail.UserId = userPriceDetailModel.UserId;
             userPriceDetail.CreditAmount = userPriceDetailModel.CreditAmount;
             userPriceDetail.DebitAmount = userPriceDetailModel.DebitAmount;
             userPriceDetail.CreatedBy = userPriceDetailModel.UserId;
             userPriceDetail.CreatedByTs = DateTime.Now;
-            return await _priceRepository.SaveUserPriceDetail(userPriceDetail);
+            await _priceRepository.SaveUserPriceDetail(userPriceDetail);
+            return await GetUserPriceDetailList();
         }
 
-        public async Task<int> UpdateUserPriceDetail(UserPriceDetailModel userPriceDetailModel) {
+        public async Task<List<UserPriceDetailModel>> UpdateUserPriceDetail(UserPriceDetailModel userPriceDetailModel) {
             UserPriceDetail userPriceDetail = await _priceRepository.GetUserPriceDetail(userPriceDetailModel.Id);
             userPriceDetail.UserId = userPriceDetailModel.UserId;
             userPriceDetail.CreditAmount = userPriceDetailModel.CreditAmount;
             userPriceDetail.DebitAmount = userPriceDetailModel.DebitAmount;
             userPriceDetail.ModifiedBy = userPriceDetailModel.UserId;
             userPriceDetail.ModifiedByTs = DateTime.Now;
-            return await _priceRepository.UpdateUserPriceDetail(userPriceDetail);
+            await _priceRepository.UpdateUserPriceDetail(userPriceDetail);
+            return await GetUserPriceDetailList();
         }
     }
 }

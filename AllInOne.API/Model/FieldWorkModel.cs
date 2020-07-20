@@ -13,6 +13,9 @@ namespace AllInOne.API.Model {
         public decimal Weight { get; set; }
         public DateTime Date { get; set; }
         public int PriceId { get; set; }
+        public decimal CreditAmount { get; set; }
+        public decimal DebitAmount { get; set; }
+        public decimal StockAmount { get; set; }
 
     }
 }

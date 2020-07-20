@@ -5,6 +5,11 @@ namespace AllInOne.Data.Entities
 {
     public partial class Price
     {
+        public Price()
+        {
+            WeightDetail = new HashSet<WeightDetail>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public decimal UnitPrice { get; set; }
@@ -14,5 +19,7 @@ namespace AllInOne.Data.Entities
         public int? ModifiedBy { get; set; }
         public DateTime? ModifiedByTs { get; set; }
         public bool IsActive { get; set; }
+
+        public virtual ICollection<WeightDetail> WeightDetail { get; set; }
     }
 }

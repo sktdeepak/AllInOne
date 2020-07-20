@@ -46,7 +46,7 @@ namespace AllInOne.Data.Implementation {
         }
 
         public async Task<List<WeightDetail>> SearchFieldWorkByUserId(int userId) {
-            return await _allInOneContext.WeightDetail.Include(i => i.User).Where(w=>w.UserId == userId).ToListAsync();
+            return await _allInOneContext.WeightDetail.Include(i => i.User).Include(p=>p.Price).Where(w=>w.UserId == userId).ToListAsync();
         }
 
         public async Task<int> SavePrice(Price price) {

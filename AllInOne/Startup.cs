@@ -35,8 +35,10 @@ namespace AllInOne {
 
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IAgricultureService, AgricultureService>();
+            services.AddTransient<IPriceService, PriceService>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IAgricultureRepository, AgricultureRepository>();
+            services.AddTransient<IPriceRepository, PriceRepository>();
 
             services.AddSwaggerGen(c =>
             {

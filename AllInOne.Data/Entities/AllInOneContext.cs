@@ -117,9 +117,17 @@ namespace AllInOne.Data.Entities
 
                 entity.Property(e => e.CreditAmount).HasColumnType("numeric(18, 2)");
 
+                entity.Property(e => e.Date).HasColumnType("datetime");
+
                 entity.Property(e => e.DebitAmount).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.ModifiedByTs).HasColumnType("datetime");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.UserPriceDetail)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_UserPriceDetail_UserInfo");
             });
 
             modelBuilder.Entity<WeightDetail>(entity =>
@@ -133,6 +141,12 @@ namespace AllInOne.Data.Entities
                 entity.Property(e => e.UnitPrice).HasColumnType("numeric(18, 2)");
 
                 entity.Property(e => e.Weight).HasColumnType("numeric(18, 2)");
+
+                entity.HasOne(d => d.Price)
+                    .WithMany(p => p.WeightDetail)
+                    .HasForeignKey(d => d.PriceId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_WeightDetail_Price");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.WeightDetail)

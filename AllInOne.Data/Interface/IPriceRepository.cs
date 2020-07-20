@@ -11,5 +11,7 @@ namespace AllInOne.Data.Interface {
         Task<int> SaveUserPriceDetail(UserPriceDetail userPriceDetail);
         Task<int> UpdateUserPriceDetail(UserPriceDetail userPriceDetail);
         Task<int> DeleteUserPriceDetail(int id);
+
+        Task<List<UserPriceDetail>> GetUserPriceDetailByUserId(int userId);
     }
 }

@@ -12,6 +12,7 @@ namespace AllInOne.API.Interface {
         Task<int> UpdateFieldWork(FieldWorkModel fieldWorkModel);
         Task<List<FieldWorkModel>> DeleteFieldWork(int id);
         Task<List<FieldWorkModel>> SearchFieldWorkByUserId(int id);
+        Task<List<FieldWorkModel>> SearchFieldWorkByUserId(int id, int viewTypeId);
 
         //Dashboard
         Task<List<DashboardModel>> GetDashboardFieldWorkList();

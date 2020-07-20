@@ -10,7 +10,7 @@ namespace AllInOne.Data.Entities
         public decimal Weight { get; set; }
         public int WeightType { get; set; }
         public decimal UnitPrice { get; set; }
-        public int? PriceId { get; set; }
+        public int PriceId { get; set; }
         public DateTime Date { get; set; }
         public DateTime CreatedByTs { get; set; }
         public int CreatedBy { get; set; }
@@ -18,6 +18,7 @@ namespace AllInOne.Data.Entities
         public DateTime? ModifiedByTs { get; set; }
         public bool IsActive { get; set; }
 
+        public virtual Price Price { get; set; }
         public virtual UserInfo User { get; set; }
     }
 }

@@ -12,8 +12,10 @@ using System.Threading.Tasks;
 namespace AllInOne.API.Implementation {
     public class AgricultureService : IAgricultureService {
         private readonly IAgricultureRepository _agricultureRepository;
-        public AgricultureService(IAgricultureRepository agricultureRepository) {
+        private readonly IPriceRepository _priceRepository;
+        public AgricultureService(IAgricultureRepository agricultureRepository, IPriceRepository priceRepository) {
             _agricultureRepository = agricultureRepository;
+            _priceRepository = priceRepository;
         }
 
         public async Task<List<FieldWorkModel>> DeleteFieldWork(int id) {
@@ -164,6 +166,43 @@ namespace AllInOne.API.Implementation {
             return dashboardModelList;
         }
 
-        
+        public async Task<List<FieldWorkModel>> SearchFieldWorkByUserId(int id, int viewTypeId) {
+            List<FieldWorkModel> fieldWorkModels = new List<FieldWorkModel>();
+            List<WeightDetail> weightDetail = await _agricultureRepository.SearchFieldWorkByUserId(id);
+            if (viewTypeId == 1)
+            {
+                foreach (var item in weightDetail.OrderByDescending(i => i.Date))
+                {
+                    fieldWorkModels.Add(new FieldWorkModel()
+                    {
+                        FullName = item.User.FullName,
+                        Weight = item.Weight,
+                        WeightType = item.WeightType,
+                        Date = item.Date,
+                        UserId = item.UserId,
+                        Id = item.Id
+                    });
+                }
+            }
+            else
+            {
+                foreach (var item in weightDetail.GroupBy(i => i.UserId))
+                {
+                  List<UserPriceDetail> userPriceDetail =  await _priceRepository.GetUserPriceDetailByUserId(item.Key);
+                    fieldWorkModels.Add(new FieldWorkModel()
+                    {
+                        FullName = item.FirstOrDefault().User.FullName,
+                        Weight = item.Sum(s => s.Weight),
+                        WeightType = item.FirstOrDefault().WeightType,
+                        Date = item.FirstOrDefault().Date,
+                        UserId = item.Key,
+                        CreditAmount = userPriceDetail.Sum(s=>s.CreditAmount) ?? 0,
+                        DebitAmount = userPriceDetail.Sum(s => s.DebitAmount) ?? 0,
+                        StockAmount = item.Sum(s => s.Weight * s.Price.UnitPrice),
+                    }) ;
+                }
+            }
+            return fieldWorkModels;
+        }
     }
 }

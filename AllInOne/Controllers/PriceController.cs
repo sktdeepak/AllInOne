@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AllInOne.API.Interface;
+using AllInOne.API.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,36 +13,43 @@ namespace AllInOne.Controllers
     [ApiController]
     public class PriceController : ControllerBase
     {
+        public IPriceService _priceService;
+        public PriceController(IPriceService priceService) {
+            _priceService = priceService;
+        }
         // GET: api/Price
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<List<UserPriceDetailModel>> Get()
         {
-            return new string[] { "value1", "value2" };
+          return await _priceService.GetUserPriceDetailList();
         }
 
         // GET: api/Price/5
         [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        public async Task<UserPriceDetailModel> Get(int id)
         {
-            return "value";
+            return await _priceService.GetUserPriceDetail(id);
         }
 
         // POST: api/Price
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<List<UserPriceDetailModel>> Post([FromBody] UserPriceDetailModel userPriceDetailModel)
         {
+            return await _priceService.SaveUserPriceDetail(userPriceDetailModel);
         }
 
         // PUT: api/Price/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<List<UserPriceDetailModel>> Put(int id, [FromBody]  UserPriceDetailModel userPriceDetailModel)
         {
+            return await _priceService.UpdateUserPriceDetail(userPriceDetailModel);
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<List<UserPriceDetailModel>> Delete(int id)
         {
+            return await _priceService.DeleteUserPriceDetail(id);
         }
     }
 }
