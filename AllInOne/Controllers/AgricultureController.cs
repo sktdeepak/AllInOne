@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AllInOne.API.Implementation;
 using AllInOne.API.Interface;
 using AllInOne.API.Model;
+using AllInOne.API.Model.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +23,7 @@ namespace AllInOne.Controllers
 
         [HttpGet]
         [Route("GetFieldWorkList")]
-        public async Task<List<FieldWorkModel>> GetFieldWorkList() {
+        public async Task<FieldWorkResponseModel> GetFieldWorkList() {
             return await _agricultureService.GetFieldWorkList();
         }
 
@@ -44,15 +45,15 @@ namespace AllInOne.Controllers
             return await _agricultureService.SearchFieldWorkByUserId(id);
         }
 
-        [HttpGet]
-        [Route("SearchFieldWorkListByViewType/{id}/{viewTypeId}")]
-        public async Task<List<FieldWorkModel>> SearchFieldWorkListByViewType(int id,int viewTypeId) {
-            return await _agricultureService.SearchFieldWorkByUserId(id, viewTypeId);
+        [HttpPost]
+        [Route("SearchFieldWorkListByViewType")]
+        public async Task<FieldWorkResponseModel> SearchFieldWorkListByViewType([FromBody]SearchModel searchModel) {
+            return await _agricultureService.SearchFieldWork(searchModel);
         }
 
         [HttpDelete]
         [Route("DeleteFieldWork/{id}")]
-        public async Task<List<FieldWorkModel>> Delete(int id) {
+        public async Task<FieldWorkResponseModel> Delete(int id) {
             return await _agricultureService.DeleteFieldWork(id);
         }
 

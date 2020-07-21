@@ -1,5 +1,6 @@
 ﻿using AllInOne.API.Interface;
 using AllInOne.API.Model;
+using AllInOne.API.Model.Response;
 using AllInOne.Data.Entities;
 using AllInOne.Data.Implementation;
 using AllInOne.Data.Interface;
@@ -18,13 +19,13 @@ namespace AllInOne.API.Implementation {
             _priceRepository = priceRepository;
         }
 
-        public async Task<List<FieldWorkModel>> DeleteFieldWork(int id) {
+        public async Task<FieldWorkResponseModel> DeleteFieldWork(int id) {
             WeightDetail weightDetail = await _agricultureRepository.GetFieldWorkById(id);
-             await _agricultureRepository.DeleteFieldWork(weightDetail);
+            await _agricultureRepository.DeleteFieldWork(weightDetail);
             return await GetFieldWorkList();
         }
 
-       
+
 
         public async Task<FieldWorkModel> GetFieldWorkById(int id) {
             FieldWorkModel fieldWorkModel = new FieldWorkModel();
@@ -32,15 +33,17 @@ namespace AllInOne.API.Implementation {
             weightDetail.Weight = fieldWorkModel.Weight;
             weightDetail.WeightType = 1;
             weightDetail.UserId = fieldWorkModel.UserId;
-            weightDetail.Date =  fieldWorkModel.Date;
+            weightDetail.Date = fieldWorkModel.Date;
             return fieldWorkModel;
         }
 
-        public async Task<List<FieldWorkModel>> GetFieldWorkList() {
+        public async Task<FieldWorkResponseModel> GetFieldWorkList() {
+            FieldWorkResponseModel fieldWorkResponseModel = new FieldWorkResponseModel();
             List<FieldWorkModel> fieldWorkModels = new List<FieldWorkModel>();
             List<WeightDetail> weightDetail = await _agricultureRepository.GetFieldWorkList();
             foreach (var item in weightDetail.OrderByDescending(i => i.Date))
             {
+                List<UserPriceDetail> userPriceDetail = await _priceRepository.GetUserPriceDetailByUserId(item.UserId);
                 fieldWorkModels.Add(new FieldWorkModel()
                 {
                     FullName = item.User.FirstName + " " + item.User.LastName,
@@ -48,13 +51,22 @@ namespace AllInOne.API.Implementation {
                     WeightType = item.WeightType,
                     Date = item.Date,
                     UserId = item.UserId,
-                    Id = item.Id
+                    Id = item.Id,
+                    CreditAmount = userPriceDetail.Sum(s => s.CreditAmount) ?? 0,
+                    DebitAmount = userPriceDetail.Sum(s => s.DebitAmount) ?? 0
                 });
             }
-            return fieldWorkModels;
+            fieldWorkResponseModel.DataList = fieldWorkModels;
+            fieldWorkResponseModel.IsSuccess = true;
+            fieldWorkResponseModel.LastAccessedTs = weightDetail.Max(i=>i.Date);
+            fieldWorkResponseModel.TotalStock = weightDetail.Sum(i => i.Weight);
+            fieldWorkResponseModel.StockAmount = weightDetail.Sum(i => i.Weight * i.Price.UnitPrice);
+            fieldWorkResponseModel.CreditAmount = fieldWorkModels.Sum(s => s.CreditAmount);
+            fieldWorkResponseModel.DebitAmount = fieldWorkModels.Sum(s => s.DebitAmount);
+            return fieldWorkResponseModel;
         }
 
-      
+
 
         public async Task<int> SaveFieldWork(FieldWorkModel fieldWorkModel) {
             WeightDetail weightDetail = new WeightDetail();
@@ -68,7 +80,7 @@ namespace AllInOne.API.Implementation {
             return await _agricultureRepository.SaveFieldWork(weightDetail);
         }
 
-       
+
         public async Task<int> UpdateFieldWork(FieldWorkModel fieldWorkModel) {
             WeightDetail weightDetail = await _agricultureRepository.GetFieldWorkById(fieldWorkModel.Id);
             weightDetail.ModifiedBy = fieldWorkModel.UserId;
@@ -124,7 +136,7 @@ namespace AllInOne.API.Implementation {
                 {
                     Id = item.Id,
                     Description = item.Description,
-                    UnitPrice=item.UnitPrice,
+                    UnitPrice = item.UnitPrice,
                     Name = item.Name
                 });
             }
@@ -154,19 +166,20 @@ namespace AllInOne.API.Implementation {
         public async Task<List<DashboardModel>> GetDashboardFieldWorkList() {
             List<DashboardModel> dashboardModelList = new List<DashboardModel>();
             List<WeightDetail> weightDetail = await _agricultureRepository.GetFieldWorkList();
-            var groupByList= weightDetail.OrderBy(p=>p.User.FirstName).GroupBy(g => g.UserId);
+            var groupByList = weightDetail.OrderBy(p => p.User.FirstName).GroupBy(g => g.UserId);
             foreach (var item in groupByList)
             {
                 dashboardModelList.Add(new DashboardModel()
                 {
                     Name = item.FirstOrDefault().User.FirstName + " " + item.FirstOrDefault().User.LastName,
                     Value = item.Sum(i => i.Weight)
-                }) ;
+                });
             }
             return dashboardModelList;
         }
 
         public async Task<List<FieldWorkModel>> SearchFieldWorkByUserId(int id, int viewTypeId) {
+            FieldWorkResponseModel fieldWorkResponseModel = new FieldWorkResponseModel();
             List<FieldWorkModel> fieldWorkModels = new List<FieldWorkModel>();
             List<WeightDetail> weightDetail = await _agricultureRepository.SearchFieldWorkByUserId(id);
             if (viewTypeId == 1)
@@ -188,7 +201,7 @@ namespace AllInOne.API.Implementation {
             {
                 foreach (var item in weightDetail.GroupBy(i => i.UserId))
                 {
-                  List<UserPriceDetail> userPriceDetail =  await _priceRepository.GetUserPriceDetailByUserId(item.Key);
+                    List<UserPriceDetail> userPriceDetail = await _priceRepository.GetUserPriceDetailByUserId(item.Key);
                     fieldWorkModels.Add(new FieldWorkModel()
                     {
                         FullName = item.FirstOrDefault().User.FullName,
@@ -196,13 +209,54 @@ namespace AllInOne.API.Implementation {
                         WeightType = item.FirstOrDefault().WeightType,
                         Date = item.FirstOrDefault().Date,
                         UserId = item.Key,
-                        CreditAmount = userPriceDetail.Sum(s=>s.CreditAmount) ?? 0,
+                        CreditAmount = userPriceDetail.Sum(s => s.CreditAmount) ?? 0,
                         DebitAmount = userPriceDetail.Sum(s => s.DebitAmount) ?? 0,
                         StockAmount = item.Sum(s => s.Weight * s.Price.UnitPrice),
-                    }) ;
+                        TotalStock = item.Sum(s => s.Weight)
+                    });
                 }
             }
             return fieldWorkModels;
+        }
+
+        public async Task<FieldWorkResponseModel> SearchFieldWork(SearchModel searchModel) {
+            FieldWorkResponseModel fieldWorkResponseModel = new FieldWorkResponseModel();
+            List<FieldWorkModel> fieldWorkModels = new List<FieldWorkModel>();
+            List<WeightDetail> result = await _agricultureRepository.GetFieldWorkList();
+            if (searchModel.UserId > 0)
+                result = result.Where(f => f.UserId == searchModel.UserId).ToList();
+            if(searchModel.StartDate != DateTime.MinValue)
+                result = result.Where(f => f.Date >= ConvertDate(searchModel.StartDate)).ToList();
+            if (searchModel.EndDate != DateTime.MinValue)
+                result = result.Where(f => f.Date <= ConvertDate(searchModel.EndDate.AddDays(1).AddTicks(-1))).ToList();
+
+            foreach (var item in result.OrderByDescending(i => i.Date))
+            {
+                List<UserPriceDetail> userPriceDetail = await _priceRepository.GetUserPriceDetailByUserId(item.UserId);
+                fieldWorkModels.Add(new FieldWorkModel()
+                {
+                    FullName = item.User.FullName,
+                    Weight = item.Weight,
+                    WeightType = item.WeightType,
+                    Date = item.Date,
+                    UserId = item.UserId,
+                    Id = item.Id,
+                    CreditAmount = userPriceDetail.Sum(s => s.CreditAmount) ?? 0,
+                    DebitAmount = userPriceDetail.Sum(s => s.DebitAmount) ?? 0
+                });
+            }
+
+            fieldWorkResponseModel.DataList = fieldWorkModels;
+            fieldWorkResponseModel.IsSuccess = true;
+            fieldWorkResponseModel.LastAccessedTs = result.Max(i => i.Date);
+            fieldWorkResponseModel.TotalStock = result.Sum(i => i.Weight);
+            fieldWorkResponseModel.StockAmount = result.Sum(i => i.Weight * i.Price.UnitPrice);
+
+            return fieldWorkResponseModel;
+        }
+
+        private DateTime ConvertDate(DateTime dateTime) {
+           return TimeZone.CurrentTimeZone.ToLocalTime(dateTime);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace AllInOne.Data.Implementation {
         }
 
         public async Task<List<WeightDetail>> GetFieldWorkList() {
-            return await _allInOneContext.WeightDetail.Include(i => i.User).ToListAsync();
+            return await _allInOneContext.WeightDetail.Include(i => i.User).Include(p => p.Price).ToListAsync();
         }
 
         public async Task<Price> GetPriceById(int id) {

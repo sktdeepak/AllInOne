@@ -1,4 +1,5 @@
 ﻿using AllInOne.API.Model;
+using AllInOne.API.Model.Response;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,13 +7,14 @@ using System.Threading.Tasks;
 
 namespace AllInOne.API.Interface {
    public interface IAgricultureService {
-        Task<List<FieldWorkModel>> GetFieldWorkList();
+        Task<FieldWorkResponseModel> GetFieldWorkList();
         Task<int> SaveFieldWork(FieldWorkModel fieldWorkModel);
         Task<FieldWorkModel> GetFieldWorkById(int id);
         Task<int> UpdateFieldWork(FieldWorkModel fieldWorkModel);
-        Task<List<FieldWorkModel>> DeleteFieldWork(int id);
+        Task<FieldWorkResponseModel> DeleteFieldWork(int id);
         Task<List<FieldWorkModel>> SearchFieldWorkByUserId(int id);
         Task<List<FieldWorkModel>> SearchFieldWorkByUserId(int id, int viewTypeId);
+        Task<FieldWorkResponseModel> SearchFieldWork(SearchModel searchModel);
 
         //Dashboard
         Task<List<DashboardModel>> GetDashboardFieldWorkList();

@@ -16,6 +16,7 @@ namespace AllInOne.API.Model {
         public decimal CreditAmount { get; set; }
         public decimal DebitAmount { get; set; }
         public decimal StockAmount { get; set; }
+        public decimal TotalStock { get; set; }
 
     }
 }

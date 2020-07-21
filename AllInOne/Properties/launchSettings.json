@@ -2,6 +2,10 @@
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/AllInOne",
+      "sslPort": 0
+    },
     "iisExpress": {
       "applicationUrl": "http://localhost:53896",
       "sslPort": 0
