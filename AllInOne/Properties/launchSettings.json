@@ -15,6 +15,7 @@
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
+      "workingDirectory": "C:\\Deepak\\Dev\\AIIInOneAPI\\AllInOne",
       "launchBrowser": true,
       "launchUrl": "swagger/index.html",
       "environmentVariables": {
@@ -33,9 +34,10 @@
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/weatherforecast",
-      "publishAllPorts": true,
-      "useSSL": true
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger/index.html",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }

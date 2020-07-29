@@ -41,9 +41,10 @@ namespace AllInOne.API.Implementation {
             FieldWorkResponseModel fieldWorkResponseModel = new FieldWorkResponseModel();
             List<FieldWorkModel> fieldWorkModels = new List<FieldWorkModel>();
             List<WeightDetail> weightDetail = await _agricultureRepository.GetFieldWorkList();
+            List<UserPriceDetail> userPriceDetail = await _priceRepository.GetUserPriceDetailList();
             foreach (var item in weightDetail.OrderByDescending(i => i.Date))
             {
-                List<UserPriceDetail> userPriceDetail = await _priceRepository.GetUserPriceDetailByUserId(item.UserId);
+               
                 fieldWorkModels.Add(new FieldWorkModel()
                 {
                     FullName = item.User.FirstName + " " + item.User.LastName,
@@ -52,8 +53,8 @@ namespace AllInOne.API.Implementation {
                     Date = item.Date,
                     UserId = item.UserId,
                     Id = item.Id,
-                    CreditAmount = userPriceDetail.Sum(s => s.CreditAmount) ?? 0,
-                    DebitAmount = userPriceDetail.Sum(s => s.DebitAmount) ?? 0
+                   // CreditAmount = userPriceDetail.Sum(s => s.CreditAmount) ?? 0,
+                   // DebitAmount = userPriceDetail.Sum(s => s.DebitAmount) ?? 0
                 });
             }
             fieldWorkResponseModel.DataList = fieldWorkModels;
@@ -61,8 +62,8 @@ namespace AllInOne.API.Implementation {
             fieldWorkResponseModel.LastAccessedTs = weightDetail.Max(i=>i.Date);
             fieldWorkResponseModel.TotalStock = weightDetail.Sum(i => i.Weight);
             fieldWorkResponseModel.StockAmount = weightDetail.Sum(i => i.Weight * i.Price.UnitPrice);
-            fieldWorkResponseModel.CreditAmount = fieldWorkModels.Sum(s => s.CreditAmount);
-            fieldWorkResponseModel.DebitAmount = fieldWorkModels.Sum(s => s.DebitAmount);
+            fieldWorkResponseModel.CreditAmount = userPriceDetail.Sum(s => s.CreditAmount) ?? 0;
+            fieldWorkResponseModel.DebitAmount = userPriceDetail.Sum(s => s.DebitAmount) ?? 0;
             return fieldWorkResponseModel;
         }
 
@@ -230,9 +231,11 @@ namespace AllInOne.API.Implementation {
             if (searchModel.EndDate != DateTime.MinValue)
                 result = result.Where(f => f.Date <= ConvertDate(searchModel.EndDate.AddDays(1).AddTicks(-1))).ToList();
 
+            List<UserPriceDetail> userPriceDetail = await _priceRepository.GetUserPriceDetailByUserId(searchModel.UserId);
+
             foreach (var item in result.OrderByDescending(i => i.Date))
             {
-                List<UserPriceDetail> userPriceDetail = await _priceRepository.GetUserPriceDetailByUserId(item.UserId);
+               
                 fieldWorkModels.Add(new FieldWorkModel()
                 {
                     FullName = item.User.FullName,
@@ -241,8 +244,8 @@ namespace AllInOne.API.Implementation {
                     Date = item.Date,
                     UserId = item.UserId,
                     Id = item.Id,
-                    CreditAmount = userPriceDetail.Sum(s => s.CreditAmount) ?? 0,
-                    DebitAmount = userPriceDetail.Sum(s => s.DebitAmount) ?? 0
+                   // CreditAmount = userPriceDetail.Sum(s => s.CreditAmount) ?? 0,
+                   // DebitAmount = userPriceDetail.Sum(s => s.DebitAmount) ?? 0
                 });
             }
 
@@ -251,6 +254,8 @@ namespace AllInOne.API.Implementation {
             fieldWorkResponseModel.LastAccessedTs = result.Max(i => i.Date);
             fieldWorkResponseModel.TotalStock = result.Sum(i => i.Weight);
             fieldWorkResponseModel.StockAmount = result.Sum(i => i.Weight * i.Price.UnitPrice);
+            fieldWorkResponseModel.DebitAmount = userPriceDetail.Sum(i => i.DebitAmount) ?? 0;
+            fieldWorkResponseModel.CreditAmount = userPriceDetail.Sum(s => s.CreditAmount) ?? 0;
 
             return fieldWorkResponseModel;
         }

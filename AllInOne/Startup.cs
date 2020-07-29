@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AllInOne.API.Implementation;
 using AllInOne.API.Interface;
@@ -29,21 +30,26 @@ namespace AllInOne {
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllers();
-
+            var config = Configuration["ConnectionStrings:MagsConnectionMssql"];
+            config = config != null ? config : "Server=.;Database=AllInOne;Trusted_Connection=Yes;";
             services.AddDbContext<AllInOneContext>(options =>
-                options.UseSqlServer("Server=.;Database=AllInOne;Trusted_Connection=Yes;"));
+                options.UseSqlServer(config));
 
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IAgricultureService, AgricultureService>();
             services.AddTransient<IPriceService, PriceService>();
+            services.AddTransient<IProductService, ProductService>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IAgricultureRepository, AgricultureRepository>();
             services.AddTransient<IPriceRepository, PriceRepository>();
+            services.AddTransient<IProductRepository, ProductRepository>();
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AllInOne API", Version = "v1" });
             });
+
+            
 
             services.AddCors(options => {
                 if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT").Contains("Development"))

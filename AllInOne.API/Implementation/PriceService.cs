@@ -34,7 +34,7 @@ namespace AllInOne.API.Implementation {
             List<UserPriceDetail> userPriceDetailList = await _priceRepository.GetUserPriceDetailList();
             foreach (var item in userPriceDetailList)
             {
-                userPriceDetailModelList.Add(new UserPriceDetailModel() { Id = item.Id, UserId = item.UserId, CreditAmount = item.CreditAmount, DebitAmount = item.DebitAmount });
+                userPriceDetailModelList.Add(new UserPriceDetailModel() { Id = item.Id,FullName=item.User.FullName, UserId = item.UserId, CreditAmount = item.CreditAmount, DebitAmount = item.DebitAmount });
             }
             return userPriceDetailModelList;
         }

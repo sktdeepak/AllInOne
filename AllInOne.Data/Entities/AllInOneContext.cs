@@ -16,6 +16,9 @@ namespace AllInOne.Data.Entities
         }
 
         public virtual DbSet<Price> Price { get; set; }
+        public virtual DbSet<Product> Product { get; set; }
+        public virtual DbSet<ProductCatogery> ProductCatogery { get; set; }
+        public virtual DbSet<ProductPriceDetail> ProductPriceDetail { get; set; }
         public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<UserInfo> UserInfo { get; set; }
         public virtual DbSet<UserPersonelInfo> UserPersonelInfo { get; set; }
@@ -27,7 +30,7 @@ namespace AllInOne.Data.Entities
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=.;Database=AllInOne;Trusted_Connection=Yes;");
+                //optionsBuilder.UseSqlServer("Server=.;Database=AllInOne;Trusted_Connection=Yes;");
             }
         }
 
@@ -42,6 +45,51 @@ namespace AllInOne.Data.Entities
                 entity.Property(e => e.Name).IsRequired();
 
                 entity.Property(e => e.UnitPrice).HasColumnType("numeric(18, 2)");
+            });
+
+            modelBuilder.Entity<Product>(entity =>
+            {
+                entity.Property(e => e.CreatedByTs).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedByTs).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).IsRequired();
+            });
+
+            modelBuilder.Entity<ProductCatogery>(entity =>
+            {
+                entity.Property(e => e.CreatedByTs).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedByTs).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).IsRequired();
+            });
+
+            modelBuilder.Entity<ProductPriceDetail>(entity =>
+            {
+                entity.Property(e => e.CreatedByTs).HasColumnType("datetime");
+
+                entity.Property(e => e.Date).HasColumnType("datetime");
+
+                entity.Property(e => e.ModifiedByTs).HasColumnType("datetime");
+
+                entity.Property(e => e.Quantity).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.Total).HasColumnType("numeric(18, 2)");
+
+                entity.Property(e => e.UnitPrice).HasColumnType("numeric(18, 2)");
+
+                entity.HasOne(d => d.ProductCategory)
+                    .WithMany(p => p.ProductPriceDetail)
+                    .HasForeignKey(d => d.ProductCategoryId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProductPriceDetail_ProductCatogery");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.ProductPriceDetail)
+                    .HasForeignKey(d => d.ProductId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_ProductPriceDetail_Product");
             });
 
             modelBuilder.Entity<Role>(entity =>
@@ -147,6 +195,11 @@ namespace AllInOne.Data.Entities
                     .HasForeignKey(d => d.PriceId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_WeightDetail_Price");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.WeightDetail)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_WeightDetail_Product");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.WeightDetail)

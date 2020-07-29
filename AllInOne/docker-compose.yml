@@ -1,0 +1,14 @@
+﻿restart: always
+services:
+  redis:
+    image: redis:alpine
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+        restart: "no"
+        restart: always
+        restart: on-failure
+        restart: unless-stopped
