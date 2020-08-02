@@ -79,7 +79,19 @@ namespace AllInOne.API.Implementation {
             List<ProductPriceDetailModel> productPriceDetailModel = new List<ProductPriceDetailModel>();
             foreach (var item in productPriceDetail)
             {
-
+                productPriceDetailModel.Add(new ProductPriceDetailModel() { 
+                    WeightType=item.WeightType, 
+                    Total=item.Total,
+                    UnitPrice=item.UnitPrice,
+                    BuyOrSell=Convert.ToInt32(item.BuyOrSell),
+                    Date=item.Date,
+                    Id=item.Id,
+                    ProductCategoryId=item.ProductCategoryId,
+                    ProductId=item.ProductId,
+                    Quantity=item.Quantity,
+                    ProductName=item.Product.Name,
+                    ProductCategoryName=item.ProductCategory.Name
+                });
             }
             return productPriceDetailModel;
         }
@@ -106,6 +118,18 @@ namespace AllInOne.API.Implementation {
 
         public async Task<List<ProductPriceDetailModel>> SaveProductPriceDetail(ProductPriceDetailModel productPriceDetailModel) {
             ProductPriceDetail productPriceDetail = new ProductPriceDetail();
+            productPriceDetail.BuyOrSell = productPriceDetailModel.BuyOrSell;
+            productPriceDetail.CreatedBy = 5;
+            productPriceDetail.CreatedByTs = DateTime.Now;
+            productPriceDetail.Date = ConvertDate(productPriceDetailModel.Date);
+            productPriceDetail.IsActive = true;
+            productPriceDetail.ProductCategoryId = productPriceDetailModel.ProductCategoryId;
+            productPriceDetail.ProductId = productPriceDetailModel.ProductId;
+            productPriceDetail.Quantity = productPriceDetailModel.Quantity;
+            productPriceDetail.UnitPrice = productPriceDetailModel.UnitPrice;
+            productPriceDetail.Total= productPriceDetailModel.Total;
+            productPriceDetail.WeightType= productPriceDetailModel.WeightType;
+
             await _productRepository.SaveProductPriceDetail(productPriceDetail);
             return await GetProductPriceList();
         }
@@ -131,11 +155,24 @@ namespace AllInOne.API.Implementation {
         }
 
         public async Task<List<ProductPriceDetailModel>> UpdateProductPriceDetail(ProductPriceDetailModel productPriceDetailModel) {
-            ProductPriceDetail productPriceDetail = new ProductPriceDetail();
+            ProductPriceDetail productPriceDetail = await _productRepository.GetProductPriceDetail(productPriceDetailModel.Id);
+            productPriceDetail.BuyOrSell = productPriceDetailModel.BuyOrSell;
+            productPriceDetail.ModifiedBy = 5;
+            productPriceDetail.ModifiedByTs = DateTime.Now;
+            productPriceDetail.Date = ConvertDate(productPriceDetailModel.Date);
+            productPriceDetail.IsActive = true;
+            productPriceDetail.ProductCategoryId = productPriceDetailModel.ProductCategoryId;
+            productPriceDetail.ProductId = productPriceDetailModel.ProductId;
+            productPriceDetail.Quantity = productPriceDetailModel.Quantity;
+            productPriceDetail.UnitPrice = productPriceDetailModel.UnitPrice;
+            productPriceDetail.Total = productPriceDetailModel.Total;
+            productPriceDetail.WeightType = productPriceDetailModel.WeightType;
             await _productRepository.UpdateProductPriceDetail(productPriceDetail);
             return await GetProductPriceList();
         }
 
-       
+        private DateTime ConvertDate(DateTime dateTime) {
+            return TimeZone.CurrentTimeZone.ToLocalTime(dateTime);
+        }
     }
 }

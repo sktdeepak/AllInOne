@@ -53,7 +53,7 @@ namespace AllInOne.Data.Implementation {
         }
 
         public async Task<List<ProductPriceDetail>> GetProductPriceDetailList() {
-            return await _allInOneContext.ProductPriceDetail.ToListAsync();
+            return await _allInOneContext.ProductPriceDetail.Include(c=>c.Product).Include(g=>g.ProductCategory).ToListAsync();
         }
 
         public async Task<int> SaveProductCategoryDetail(ProductCatogery productCatogery) {
